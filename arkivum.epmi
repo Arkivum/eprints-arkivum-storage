@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
-<epm xmlns='http://eprints.org/ep2/data/2.0' id='http://192.168.23.142/id/epm/arkivum'>
+<epm xmlns='http://eprints.org/ep2/data/2.0' id='http://template.ulcc.ac.uk/id/epm/arkivum'>
   <epmid>arkivum</epmid>
-  <uri>http://pok.pok.com/id/epm/arkivum</uri>
+  <uri>http://192.168.23.142/id/epm/arkivum</uri>
   <documents>
     <document>
       <files>
@@ -33,7 +33,7 @@
           <datasetid>document</datasetid>
           <filename>plugins/EPrints/Plugin/Event/Arkivum.pm</filename>
           <mime_type>text/plain</mime_type>
-          <hash>44ca5786316ff3b013a9b631cae67847</hash>
+          <hash>438c80798436ac4a7bcdeeb748fb8f40</hash>
           <hash_type>MD5</hash_type>
           <filesize>58456</filesize>
         </file>
@@ -145,9 +145,9 @@
           <datasetid>document</datasetid>
           <filename>epm/arkivum/cfg/cfg.d/x_arkivum.pl</filename>
           <mime_type>text/plain</mime_type>
-          <hash>8b33d21bfe1da406fb7155be53653fbb</hash>
+          <hash>100d755849fecb8384ad8f3686efbbc1</hash>
           <hash_type>MD5</hash_type>
-          <filesize>9898</filesize>
+          <filesize>9899</filesize>
         </file>
       </files>
       <mime_type>text/plain</mime_type>
@@ -171,7 +171,7 @@
       <content>coverimage</content>
     </document>
   </documents>
-  <version>2.1</version>
+  <version>2.1.1</version>
   <controller>EPMC::Arkivum</controller>
   <creators>
     <item>
@@ -189,7 +189,7 @@
       <id>mark.pembury@arkivum.com</id>
     </item>
   </creators>
-  <datestamp>2018-11-09 23:16:05</datestamp>
+  <datestamp>2020-01-27 08:38:13</datestamp>
   <title>Arkivum A-Stor Storage Integration</title>
   <description>Use Arkivum&apos;s assured archive service to keep EPrints documents safe and secure for the long-term, with 100% guarantee against data loss.</description>
   <requirements>You will need to ensure the following Perl modules are installed:
