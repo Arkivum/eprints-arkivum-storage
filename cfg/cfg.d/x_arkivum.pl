@@ -34,7 +34,7 @@ $c->{plugins}->{"Event::Arkivum"}->{params}->{datapool} = "";
 
 
 #
-# The URL of the A-Stor appliance. E.g. https://172.18.2.9:8443
+# The URL of the A-Stor appliance. E.g. https://arkvum.host:9443
 #
 
 $c->{plugins}->{"Storage::ArkivumStorage"}->{params}->{server_url} = "";

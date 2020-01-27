@@ -731,7 +731,7 @@ sub astor_doc_copy
 
 	  # We have contact with the server and have the status
 	  # so check the free space before we do anything
-	  my $freespace = $json->{'storage'}{'bytesFree'};
+	  my $freespace = $json->{'Storage'}{'BytesFree'};
 	  my $totalsize = 0;
 
 	  # We need to check the freespace before we copy the file(s)
