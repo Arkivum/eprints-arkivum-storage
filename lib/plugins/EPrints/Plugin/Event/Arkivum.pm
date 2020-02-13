@@ -858,7 +858,8 @@ sub astor_doc_status_checker
 #JAS		    my $ingestState = @{$fileInfo->{"results"}}[0]->{"ingestState"};
 #JAS		    my $replState   = @{$fileInfo->{"results"}}[0]->{"replicationState"};
 #JAS		    my $astorMD5	= @{$fileInfo->{"results"}}[0]->{"MD5checksum"};
-		    my $ingestState = $fileInfo->{"ingestState"};
+		    my $ingestState = '';
+		    $ingestState = $fileInfo->{"ingestState"} if defined $fileInfo->{"ingestState"};
 		    my $replState   = $fileInfo->{"replicationState"};
 		    my $astorMD5	= $fileInfo->{"md5"};
 		
@@ -1897,8 +1898,11 @@ sub _astor_getRequest
 
 	  my $ark_server = $self->param( "server_url" );
 	  my $server_url = $ark_server . $url;
-	  my $ua       = LWP::UserAgent->new();
-	  my $response = $ua->get( $server_url );
+	  return EPrints::Const::HTTP_FORBIDDEN unless $self->_astor_auth;
+
+	  my $ua = LWP::UserAgent->new();
+	  
+	  my $response = $ua->get( $server_url, Authorization => "bearer ".$self->{token} );
     
 	  return $response;
 }
@@ -1910,13 +1914,31 @@ sub _astor_postRequest
 
 	  my $ark_server = $self->param( "server_url" );
 	  my $server_url = $ark_server . $url;
+	  
+	  return EPrints::Const::HTTP_FORBIDDEN unless $self->_astor_auth;
 
-	  my $ua       = LWP::UserAgent->new();
-	  my $response = $ua->post( $server_url );
+	  my $ua = LWP::UserAgent->new();
+	  my $response = $ua->post( $server_url, Authorization => "bearer ".$self->{token} );
     
 	  return $response;
 }
+sub _astor_auth
+{
+	my ($self) = @_;
+	my $url = $self->param( "server_url" )."/login";
 
+	my $ua = LWP::UserAgent->new();
+
+	my $response = $ua->post( $url, {username => $self->{astor_user}, password => $self->{astor_password}} );
+        if($response->is_success){
+		$self->{token} = $response->content;
+		return 1;
+	}else{
+		$self->_log("Astor authentication failed");
+		return 0;
+	}
+
+}
 
 sub _log 
 {

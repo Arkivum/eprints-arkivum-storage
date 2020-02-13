@@ -32,6 +32,8 @@ $c->{plugins}->{"Storage::ArkivumStorage"}->{params}->{mount_path} = "";
 #
 $c->{plugins}->{"Event::Arkivum"}->{params}->{datapool} = "";
 
+$c->{plugins}->{"Event::Arkivum"}->{params}->{astor_user} = "";
+$c->{plugins}->{"Event::Arkivum"}->{params}->{astor_password} = "";
 
 #
 # The URL of the A-Stor appliance. E.g. https://arkvum.host:9443
