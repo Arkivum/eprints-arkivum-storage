@@ -33,9 +33,9 @@
           <datasetid>document</datasetid>
           <filename>plugins/EPrints/Plugin/Event/Arkivum.pm</filename>
           <mime_type>text/plain</mime_type>
-          <hash>b02ca3a914ddea2babe849c0d5143c3a</hash>
+          <hash>93946bcf6a2aad6df6499043b2034221</hash>
           <hash_type>MD5</hash_type>
-          <filesize>59123</filesize>
+          <filesize>59137</filesize>
         </file>
         <file>
           <datasetid>document</datasetid>
@@ -189,7 +189,7 @@
       <id>mark.pembury@arkivum.com</id>
     </item>
   </creators>
-  <datestamp>2020-02-13 12:04:28</datestamp>
+  <datestamp>2020-02-13 13:03:07</datestamp>
   <title>Arkivum A-Stor Storage Integration</title>
   <description>Use Arkivum&apos;s assured archive service to keep EPrints documents safe and secure for the long-term, with 100% guarantee against data loss.</description>
   <requirements>You will need to ensure the following Perl modules are installed:
