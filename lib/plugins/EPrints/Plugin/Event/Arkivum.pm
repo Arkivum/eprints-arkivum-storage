@@ -1929,7 +1929,7 @@ sub _astor_auth
 
 	my $ua = LWP::UserAgent->new();
 
-	my $response = $ua->post( $url, {username => $self->{astor_user}, password => $self->{astor_password}} );
+	my $response = $ua->post( $url, {username => $self->param("astor_user"), password => $self->param("astor_password")} );
         if($response->is_success){
 		$self->{token} = $response->content;
 		return 1;
