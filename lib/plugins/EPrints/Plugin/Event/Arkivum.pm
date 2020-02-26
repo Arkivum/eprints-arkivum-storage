@@ -731,7 +731,7 @@ sub astor_doc_copy
 
 	  # We have contact with the server and have the status
 	  # so check the free space before we do anything
-	  my $freespace = $json->{'storage'}{'bytesFree'};
+	  my $freespace = $json->{'Storage'}{'BytesFree'};
 	  my $totalsize = 0;
 
 	  # We need to check the freespace before we copy the file(s)
@@ -842,19 +842,26 @@ sub astor_doc_status_checker
 			      $self->_log("astor_doc_status_checker: Error getting file info from A-Stor for Document $docid..");
 			      return EPrints::Const::HTTP_INTERNAL_SERVER_ERROR;
 		    }
-		
-		    # Check we have some results before we try to get them. We should have one result
-		    my $rcount = @{$fileInfo->{"results"}};
-		    if ( $rcount ne 1 )
-		    {
-			      $self->_log("astor_doc_status_checker: No file info returned from A-Stor for Document $docid. This file may be in the process of being removed.");
-	          return EPrints::Const::HTTP_OK;
-		    }
+
+#JAS Have removed this as it no longer returns an array
+#JAS We need to do some form of 'empty' check here ????
+#JAS SEE NEW getFileInfo code		
+#JAS		    # Check we have some results before we try to get them. We should have one result
+#JAS		    my $rcount = @{$fileInfo->{"results"}};
+#JAS		    if ( $rcount ne 1 )
+#JAS		    {
+#JAS			      $self->_log("astor_doc_status_checker: No file info returned from A-Stor for Document $docid. This file may be in the process of being removed.");
+#JAS	          return EPrints::Const::HTTP_OK;
+#JAS		    }
 		
 		    # Get the ingest and replication status values from A-Stor
-		    my $ingestState = @{$fileInfo->{"results"}}[0]->{"ingestState"};
-		    my $replState   = @{$fileInfo->{"results"}}[0]->{"replicationState"};
-		    my $astorMD5	= @{$fileInfo->{"results"}}[0]->{"MD5checksum"};
+#JAS		    my $ingestState = @{$fileInfo->{"results"}}[0]->{"ingestState"};
+#JAS		    my $replState   = @{$fileInfo->{"results"}}[0]->{"replicationState"};
+#JAS		    my $astorMD5	= @{$fileInfo->{"results"}}[0]->{"MD5checksum"};
+		    my $ingestState = '';
+		    $ingestState = $fileInfo->{"ingestState"} if defined $fileInfo->{"ingestState"};
+		    my $replState   = $fileInfo->{"replicationState"};
+		    my $astorMD5	= $fileInfo->{"md5"};
 		
 	      if ($astor_status eq "ingest_in_progress") 
 	      {
@@ -1087,7 +1094,9 @@ sub astor_doc_delete_checker
 			      $self->_log("astor_doc_delete_checker: Error getting file info from A-Stor for Document $docid..");
 			      return EPrints::Const::HTTP_INTERNAL_SERVER_ERROR;
 		    }
-		
+
+#JAS Need to do something here to determine if file exist and increment count if it does
+#JAS We need to do some form of 'empty' check here ????		
 		    # Check if any files have been returned in the results. We are expecting
 		    # zero, so if state_count for all files is not zeor then we can't 
 		    # change the status
@@ -1260,15 +1269,17 @@ sub astor_doc_restore_checker
 		        }
 
             # Check we have some results returned from A-Stor
-		        my $rcount = @{$fileInfo->{"results"}};
-		        if ( $rcount ne 1 )
-		        {
-			          $self->_log("astor_doc_restore_checker: No file info returned from A-Stor for Document $docid..");
-			          return EPrints::Const::HTTP_INTERNAL_SERVER_ERROR;
-		        }
+# We need to do some form of 'empty' check here ????		
+#JAS		        my $rcount = @{$fileInfo->{"results"}};
+#JAS		        if ( $rcount ne 1 )
+#JAS		        {
+#JAS			          $self->_log("astor_doc_restore_checker: No file info returned from A-Stor for Document $docid..");
+#JAS			          return EPrints::Const::HTTP_INTERNAL_SERVER_ERROR;
+#JAS		        }
 		
 		        # Get the local property of the file and test it
-		        my $local = @{$fileInfo->{"results"}}[0]->{"local"};
+#JAS		        my $local = @{$fileInfo->{"results"}}[0]->{"local"};
+		        my $local = $fileInfo->{"local"};
 		
 		        if ( $local eq "true" )
 		        {
@@ -1680,14 +1691,53 @@ sub _astor_getStatusInfo
 	  return $json;
 }
 
+#JAS The old 'search code'
+#JAS Replaced with the code below
+#sub _astor_getFileInfo
+#{
+#	  my( $self, $filename) = @_;
+#
+#	  my $api_url = "/json/search/files?path=" . $filename;
+#
+#	  my $response = $self->_astor_getRequest($api_url);
+#	  if ( not defined $response )
+#	  {
+#		    $self->_log("_astor_getFileInfo: Invalid response returned...");
+#		    return;
+#	  }
+#
+#	  if ($response->is_error) 
+#	  {
+#		    $self->_log("_astor_getFileInfo: Invalid response returned: $response->status_line");
+#		    return;
+#	  }
+#
+#	  # Get the content which should be a json string
+#	  my $json = decode_json($response->content);
+#	  if ( not defined $json) 
+#	  {
+#		    $self->_log("_astor_getFileInfo: Invalid response returned...");
+#		    return;
+#	  }
+#    
+#	  return $json;
+#}
 
+#JAS New getFileInfo
+#JAS Replaces the original code
+#JAS
 sub _astor_getFileInfo
 {
 	  my( $self, $filename) = @_;
+###############
+# RM add datapool config item for when astor is mounted to a datapool directory rather than arkivum root
+###############
+	  my $datapool = $self->param( "datapool" );
 
-	  my $api_url = "/json/search/files?path=" . $filename;
-
+	  my $api_url = "/api/2/files/fileInfo/" . $datapool . $filename;
+###############
 	  my $response = $self->_astor_getRequest($api_url);
+
 	  if ( not defined $response )
 	  {
 		    $self->_log("_astor_getFileInfo: Invalid response returned...");
@@ -1696,7 +1746,7 @@ sub _astor_getFileInfo
 
 	  if ($response->is_error) 
 	  {
-		    $self->_log("_astor_getFileInfo: Invalid response returned: $response->status_line");
+		    $self->_log("_astor_getFileInfo: Invalid response returned: ".$response->status_line);
 		    return;
 	  }
 
@@ -1722,7 +1772,13 @@ sub _astor_getFilePathInfo
 		    return;
 	  }
 
-	  my $api_url = "/files/" . $path;
+###############
+# RM add datapool config item for when astor is mounted to a datapool directory rather than arkivum root
+###############
+	  my $datapool = $self->param( "datapool" );
+	 
+	  my $api_url = "/files/" . $datapool ."/". $path;
+###############
 	  
 	  my $response = $self->_astor_getRequest($api_url);
 	  if ( not defined $response )
@@ -1842,9 +1898,11 @@ sub _astor_getRequest
 
 	  my $ark_server = $self->param( "server_url" );
 	  my $server_url = $ark_server . $url;
+	  return EPrints::Const::HTTP_FORBIDDEN unless $self->_astor_auth;
 
-	  my $ua       = LWP::UserAgent->new();
-	  my $response = $ua->get( $server_url );
+	  my $ua = LWP::UserAgent->new();
+	  
+	  my $response = $ua->get( $server_url, Authorization => "bearer ".$self->{token} );
     
 	  return $response;
 }
@@ -1856,13 +1914,31 @@ sub _astor_postRequest
 
 	  my $ark_server = $self->param( "server_url" );
 	  my $server_url = $ark_server . $url;
+	  
+	  return EPrints::Const::HTTP_FORBIDDEN unless $self->_astor_auth;
 
-	  my $ua       = LWP::UserAgent->new();
-	  my $response = $ua->post( $server_url );
+	  my $ua = LWP::UserAgent->new();
+	  my $response = $ua->post( $server_url, Authorization => "bearer ".$self->{token} );
     
 	  return $response;
 }
+sub _astor_auth
+{
+	my ($self) = @_;
+	my $url = $self->param( "server_url" )."/login";
 
+	my $ua = LWP::UserAgent->new();
+
+	my $response = $ua->post( $url, {username => $self->{astor_user}, password => $self->{astor_password}} );
+        if($response->is_success){
+		$self->{token} = $response->content;
+		return 1;
+	}else{
+		$self->_log("Astor authentication failed");
+		return 0;
+	}
+
+}
 
 sub _log 
 {

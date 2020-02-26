@@ -26,7 +26,17 @@ $c->{plugins}{"Screen::Workflow::AStorApprove"}{params}{disable} = 0;
 $c->{plugins}->{"Storage::ArkivumStorage"}->{params}->{mount_path} = "";
 
 #
-# The URL of the A-Stor appliance. E.g. https://172.18.2.9:8443
+# Adding this as the api interaction assumes that we are looking on the arkivum root.
+# For most instances this will be the case, but not always if only a certain datapool 
+# is mounted tell us here
+#
+$c->{plugins}->{"Event::Arkivum"}->{params}->{datapool} = "";
+
+$c->{plugins}->{"Event::Arkivum"}->{params}->{astor_user} = "";
+$c->{plugins}->{"Event::Arkivum"}->{params}->{astor_password} = "";
+
+#
+# The URL of the A-Stor appliance. E.g. https://arkvum.host:9443
 #
 
 $c->{plugins}->{"Storage::ArkivumStorage"}->{params}->{server_url} = "";
@@ -186,13 +196,13 @@ $c->add_dataset_trigger( "eprint", EP_TRIGGER_STATUS_CHANGE ,
     sub 
     {
         my ( %params ) = @_;
-        my $repository = %params->{repository};
+        my $repository = $params{repository};
 
         return undef if (!defined $repository);
 
-		    if (defined %params->{dataobj})
+		    if (defined $params{dataobj})
 		    {
-			      my $dataobj = %params->{dataobj};
+			      my $dataobj = $params{dataobj};
 			      my $eprintid = $dataobj->id;
 			
 			      # Get the eprint object so we can check the status
